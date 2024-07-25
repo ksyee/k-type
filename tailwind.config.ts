@@ -1,20 +1,61 @@
-import type { Config } from "tailwindcss";
+import range from 'lodash/range';
 
-const config: Config = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+const pxToRem = (px: number, base: number = 16) => `${px / base}rem`;
+
+const pxToRemFunc = (start: number, end: number): { [key: string]: string } => {
+  return range(start, end).reduce(
+    (acc, px) => {
+      acc[`${px}pxr`] = pxToRem(px);
+      return acc;
+    },
+    {} as { [key: string]: string }
+  );
+};
+
+/** @type {import('tailwindcss').Config} */
+const tailwindConfig: import('tailwindcss').Config = {
+  content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      spacing: {
+        ...pxToRemFunc(1, 500),
+      },
+      inset: {
+        ...pxToRemFunc(1, 500),
+      },
+      fontSize: {
+        ...pxToRemFunc(1, 500),
+      },
+      lineHeight: {
+        ...pxToRemFunc(1, 500),
+      },
+      screens: {
+        mobile: '360px',
+        tablet: '768px',
+        desktop: '1280px',
+      },
+      fontFamily: {
+        pretendard: ['var(--font-pretendard)'],
+      },
+      keyframes: {
+        typingBlock: {
+          '0%': {
+            opacity: '1',
+          },
+          '50%': {
+            opacity: '1',
+          },
+          '100%': {
+            opacity: '0',
+          },
+        },
+      },
+      animation: {
+        typingBlock: 'typingBlock 1s infinite',
       },
     },
   },
   plugins: [],
 };
-export default config;
+
+export default tailwindConfig;
