@@ -1,75 +1,64 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { disassembleHangulToGroups } from 'es-hangul';
+import { useState, useEffect, useMemo } from 'react';
+import { disassembleHangulToGroups, hangulIncludes } from 'es-hangul';
+import { cssNumber } from 'jquery';
 
-const word = '타이핑 테스트입니다.';
+const targetSentence = '당신이 잘 하는 일이라면 무엇이나 행복에 도움이 된다.';
 
 export function TypingSection() {
-  const [typing, setTyping] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [charColors, setCharColors] = useState<string[]>(
+    Array(targetSentence.length).fill('white')
+  );
 
-  const arrayToTargetWord = word.split('');
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
 
-  // 타겟 단어를 초성, 중성, 종성으로 분해
-  const disassembleTargetWord = disassembleHangulToGroups(word);
+  const getCharColors = useMemo(() => {
+    const targetSentenceArr = targetSentence.split('');
+    const inputValueArr = inputValue.split('');
+    const newColors = Array(targetSentence.length).fill('white');
 
-  const isCorrect = (targetWord: string[][], inputWord: string): boolean => {
-    let result = false;
-    const disassembleInputWord = disassembleHangulToGroups(inputWord);
+    inputValueArr.forEach((char, index) => {
+      const disassembleChar = disassembleHangulToGroups(char);
+      const disassembleTargetChar = disassembleHangulToGroups(
+        targetSentenceArr[index]
+      );
 
-    // if (disassembleInputWord.length > targetWord.length && word === typing) {
-    //   return true;
-    // }
+      console.log(disassembleChar);
+      console.log(disassembleTargetChar);
 
-    disassembleInputWord.forEach((input, index) => {
-      if (targetWord[index] === undefined) {
-        word === typing ? (result = true) : (result = false);
-        return result;
-      }
+      const isMatched = true;
 
-      const jamoLength = targetWord[index].length;
-
-      for (let i = 0; i < jamoLength; i++) {
-        if (input[i] === targetWord[index][i]) {
-          result = true;
-        } else {
-          result = false;
-        }
-      }
+      newColors[index] = isMatched ? 'gray' : 'red';
     });
 
-    return result;
-  };
-
-  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
-    setTyping(input);
-  };
+    return newColors;
+  }, [inputValue]);
 
   useEffect(() => {
-    console.log(isCorrect(disassembleTargetWord, typing));
-  }, [typing]);
+    setCharColors(getCharColors);
+  }, [getCharColors]);
 
   return (
-    <section className="text-zinc-300">
-      <h2 className="sr-only">Typing Section</h2>
-      <p id="target-text">
-        {arrayToTargetWord.map((word, index) => {
+    <div className="text-zinc-50">
+      <h1>문장 비교기</h1>
+      <p>
+        {targetSentence.split('').map((char, index) => {
           return (
-            <span key={index} className={''}>
-              {word}
+            <span key={index} style={{ color: charColors[index] }}>
+              {char}
             </span>
           );
         })}
       </p>
       <input
         type="text"
-        name="typing-text"
-        id="typing-text"
-        value={typing}
-        onChange={handleTyping}
-        className="bg-transparent text-zinc-100 outline-none"
-        autoComplete="off"
+        className="w-screen text-black"
+        onChange={handleInput}
+        placeholder="문장을 입력하세요"
       />
-    </section>
+    </div>
   );
 }

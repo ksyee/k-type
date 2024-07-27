@@ -21,7 +21,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ko-KR">
       <body className={`${pretendard.className} h-screen w-screen bg-zinc-700`}>
-        <Navbar />
+        <header>
+          <Navbar />
+        </header>
         {children}
       </body>
     </html>
