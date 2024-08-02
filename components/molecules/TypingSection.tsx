@@ -1,51 +1,74 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
-import { disassembleHangulToGroups, hangulIncludes } from 'es-hangul';
-import { cssNumber } from 'jquery';
+import { useState, useEffect, useCallback } from 'react';
 
-const targetSentence = '당신이 잘 하는 일이라면 무엇이나 행복에 도움이 된다.';
+const initialSentence = '당신이 잘 하는 일이라면 무엇이나 행복에 도움이 된다.';
 
 export function TypingSection() {
-  const [inputValue, setInputValue] = useState('');
+  const [sentence, setSentence] = useState<string>(initialSentence);
+
+  const [displayWord, setDisplayWord] = useState<string>(sentence);
+  const [inputValue, setInputValue] = useState<string>('');
   const [charColors, setCharColors] = useState<string[]>(
-    Array(targetSentence.length).fill('white')
+    Array(displayWord.length).fill('white')
   );
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-  };
-
-  const getCharColors = useMemo(() => {
-    const targetSentenceArr = targetSentence.split('');
-    const inputValueArr = inputValue.split('');
-    const newColors = Array(targetSentence.length).fill('white');
-
-    inputValueArr.forEach((char, index) => {
-      const disassembleChar = disassembleHangulToGroups(char);
-      const disassembleTargetChar = disassembleHangulToGroups(
-        targetSentenceArr[index]
-      );
-
-      console.log(disassembleChar);
-      console.log(disassembleTargetChar);
-
-      const isMatched = true;
-
-      newColors[index] = isMatched ? 'gray' : 'red';
-    });
-
-    return newColors;
-  }, [inputValue]);
+  }, []);
 
   useEffect(() => {
-    setCharColors(getCharColors);
-  }, [getCharColors]);
+    (async () => {
+      const response = await fetch('http://localhost:3000/api/sentence', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((res) => res.json());
+
+      const randomIndex = Math.floor(Math.random() * response.length);
+
+      setSentence(response[randomIndex].text);
+    })();
+  }, []);
+
+  useEffect(() => {
+    const newCharColors = [];
+    const newDisplayWord = [];
+
+    for (let i = 0; i < sentence.length; i++) {
+      if (i >= inputValue.length) {
+        newCharColors.push('white');
+        newDisplayWord.push(sentence[i]);
+        continue;
+      }
+
+      const inputChar = inputValue[i];
+      const targetChar = sentence[i];
+
+      if (inputChar === targetChar) {
+        newCharColors.push('gray');
+        newDisplayWord.push(sentence[i]);
+      } else {
+        if (sentence[i] === ' ') {
+          newCharColors.push('red');
+          newDisplayWord.push('_');
+        } else {
+          newCharColors.push('red');
+          newDisplayWord.push(sentence[i]);
+        }
+      }
+    }
+
+    setCharColors(newCharColors);
+    setDisplayWord(newDisplayWord.join(''));
+  }, [inputValue, sentence]);
 
   return (
-    <div className="text-zinc-50">
-      <h1>문장 비교기</h1>
-      <p>
-        {targetSentence.split('').map((char, index) => {
+    <section className="absolute left-1/2 top-1/3 w-[80%] max-w-[900px] -translate-x-1/2 overflow-hidden rounded-lg bg-zinc-600 text-zinc-50">
+      <h2 className="sr-only">타이핑 섹션</h2>
+      <span></span>
+      <p className="text-18pxr">
+        {displayWord.split('').map((char, index) => {
           return (
             <span key={index} style={{ color: charColors[index] }}>
               {char}
@@ -55,10 +78,12 @@ export function TypingSection() {
       </p>
       <input
         type="text"
-        className="w-screen text-black"
+        className="w-full border-b-2 border-green-700 bg-transparent text-18pxr text-white outline-none"
         onChange={handleInput}
+        value={inputValue}
         placeholder="문장을 입력하세요"
+        maxLength={displayWord.length}
       />
-    </div>
+    </section>
   );
 }
