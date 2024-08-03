@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import { CPM } from '@/components/atoms';
 
 const initialSentence = '당신이 잘 하는 일이라면 무엇이나 행복에 도움이 된다.';
 
@@ -66,7 +67,7 @@ export function TypingSection() {
   return (
     <section className="absolute left-1/2 top-1/3 w-[80%] max-w-[900px] -translate-x-1/2 overflow-hidden rounded-lg bg-zinc-600 text-zinc-50">
       <h2 className="sr-only">타이핑 섹션</h2>
-      <span></span>
+      <CPM />
       <p className="text-18pxr">
         {displayWord.split('').map((char, index) => {
           return (
@@ -82,6 +83,7 @@ export function TypingSection() {
         onChange={handleInput}
         value={inputValue}
         placeholder="문장을 입력하세요"
+        autoFocus
         maxLength={displayWord.length}
       />
     </section>
