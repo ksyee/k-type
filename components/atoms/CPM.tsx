@@ -1,3 +1,8 @@
+'use client';
+
+import { useCpmStore } from '@/store/cpmStore';
+
 export function CPM() {
-  return <div>CPM</div>;
+  const { cpm } = useCpmStore();
+  return <span>{cpm}</span>;
 }

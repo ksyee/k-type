@@ -14,7 +14,7 @@ const pretendard = localFont({
 
 export const metadata: Metadata = {
   title: 'K-TYPE',
-  description: '타이핑만 하세요',
+  description: '타이핑에만 집중할 수 있도록',
 };
 
 export default function RootLayout({ children }: RootLayoutProps) {
