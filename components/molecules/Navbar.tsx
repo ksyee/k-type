@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function Navbar() {
   return (
-    <nav className="p-16pxr">
+    <nav className="p-16pxr fixed left-0 top-0">
       <ul>
         <li>
           <Link href="/">

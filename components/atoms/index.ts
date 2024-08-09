@@ -1,1 +1,1 @@
-export { Block } from './Block';
+export { RealTimeCPM } from './RealTimeCPM';

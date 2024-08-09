@@ -18,41 +18,25 @@ const tailwindConfig: import('tailwindcss').Config = {
   theme: {
     extend: {
       spacing: {
-        ...pxToRemFunc(1, 500),
+        ...pxToRemFunc(1, 1000),
       },
       inset: {
-        ...pxToRemFunc(1, 500),
+        ...pxToRemFunc(1, 1000),
       },
       fontSize: {
-        ...pxToRemFunc(1, 500),
+        ...pxToRemFunc(1, 1000),
       },
       lineHeight: {
-        ...pxToRemFunc(1, 500),
+        ...pxToRemFunc(1, 1000),
       },
       screens: {
         mobile: '360px',
         tablet: '768px',
         desktop: '1280px',
       },
-      fontFamily: {
-        pretendard: ['var(--font-pretendard)'],
-      },
-      keyframes: {
-        typingBlock: {
-          '0%': {
-            opacity: '1',
-          },
-          '50%': {
-            opacity: '1',
-          },
-          '100%': {
-            opacity: '0',
-          },
-        },
-      },
-      animation: {
-        typingBlock: 'typingBlock 1s infinite',
-      },
+    },
+    fontFamily: {
+      sans: ['Pretandard Variable', 'Pretendard', 'noto-sans-kr', 'sans-serif'],
     },
   },
   plugins: [],
