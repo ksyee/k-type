@@ -7,6 +7,10 @@ export const GET = async (request: Request) => {
       },
     }).then((res) => res.json());
 
+    if (!response) {
+      throw new Error('No data');
+    }
+
     return new Response(JSON.stringify(response), {
       status: 200,
     });
