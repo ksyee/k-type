@@ -6,7 +6,7 @@ export function Report() {
   const { report } = useReportStore();
 
   return (
-    <ul className="text-white">
+    <ul className="rounded bg-zinc-50 shadow-md dark:bg-zinc-700 dark:text-white">
       <li>
         <span>CPM</span>
         <span>{report.cpm}</span>

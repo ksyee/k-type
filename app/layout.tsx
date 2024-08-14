@@ -26,8 +26,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="ko-KR">
-      <body className={`${pretendard.className} h-screen w-screen bg-zinc-900`}>
+    <html lang="ko-KR" className="">
+      <body
+        className={`${pretendard.className} h-screen w-screen bg-zinc-200 dark:bg-zinc-900`}
+      >
         <header>
           <Navbar />
         </header>
