@@ -11,7 +11,9 @@ export const fetchSentence = async () => {
       throw new Error('문장을 불러오지 못했습니다.');
     }
 
-    return await response.json();
+    const data = await response.json();
+
+    return data;
   } catch (error) {
     console.error('Error fetching sentence:', error);
     throw error;
