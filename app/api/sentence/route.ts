@@ -5,13 +5,15 @@ export const GET = async (request: Request) => {
       headers: {
         'Content-Type': 'application/json',
       },
-    }).then((res) => res.json());
+    });
+
+    const data = await response.json();
 
     if (!response) {
       throw new Error('No data');
     }
 
-    return new Response(JSON.stringify(response), {
+    return new Response(JSON.stringify(data), {
       status: 200,
     });
   } catch (error) {
