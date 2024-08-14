@@ -6,7 +6,7 @@ export function handleInput(
   startTime: number | null,
   setTime: (time: { startTime: number | null; endTime: number | null }) => void,
   setInputValue: (value: string) => void,
-  startCpmInterval: () => () => void,
+  startCpmInterval: () => void,
   setCpm: (cpm: number) => void,
   inputValue: string,
   setTextareaLines: (lines: number) => void
@@ -23,7 +23,10 @@ export function handleInput(
 
   setInputValue(e.target.value);
 
-  const lines = e.target.value.split('\n').length;
+  const textarea = e.target;
+  const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight, 10);
+  const lines = Math.floor(textarea.scrollHeight / lineHeight);
+
   setTextareaLines(lines);
 }
 
@@ -33,15 +36,14 @@ export function handleEnter(e: React.KeyboardEvent<HTMLTextAreaElement>) {
   }
 }
 
-export function keyPressEscape(
-  e: React.KeyboardEvent<HTMLTextAreaElement>,
+export function clearInput(
   setInputValue: (value: string) => void,
   setCpm: (cpm: number) => void,
-  setTime: (time: { startTime: number | null; endTime: number | null }) => void
+  setTime: (time: { startTime: number | null; endTime: number | null }) => void,
+  setTextareaLines: (lines: number) => void
 ) {
-  if (e.key === 'Escape') {
-    setInputValue('');
-    setCpm(0);
-    setTime({ startTime: null, endTime: null });
-  }
+  setInputValue('');
+  setCpm(0);
+  setTime({ startTime: null, endTime: null });
+  setTextareaLines(1);
 }
