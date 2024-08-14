@@ -14,6 +14,7 @@ const pxToRemFunc = (start: number, end: number): { [key: string]: string } => {
 
 /** @type {import('tailwindcss').Config} */
 const tailwindConfig: import('tailwindcss').Config = {
+  darkMode: 'selector',
   content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
