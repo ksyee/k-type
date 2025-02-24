@@ -1,16 +1,21 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useCpmStore } from '@/store/cpmStore';
-import { useReportStore } from '@/store/reportStore';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useCpmStore } from '@/stores/cpmStore';
+import { useReportStore } from '@/stores/reportStore';
 import { Report } from '@/components/molecules';
 
 import { fetchSentence } from '@/services/api';
-import { calculateCharColors } from '@/utils/colorUtils';
+import { calculateCharColors } from '@/utils/colorUtil';
 import {
   handleInput,
   handleEnter,
   keyPressEscape,
 } from '@/handlers/inputHandlers';
+
+interface Sentence {
+  speaker: string;
+  text: string;
+}
 
 export function TypingSection() {
   const {
@@ -35,8 +40,19 @@ export function TypingSection() {
   );
   const [textareaLines, setTextareaLines] = useState<number>(1);
 
-  const usedSentencesRef = useRef<Set<string>>(new Set());
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // 문장 배열을 가져오는 함수
+  const loadSentences = useCallback(async () => {
+    try {
+      const response: Sentence[] = await fetchSentence();
+      console.log(response);
+      setSentence(response[1]);
+    } catch (error) {
+      console.error('Error fetching sentence:', error);
+      throw error;
+    }
+  }, []);
 
   // CPM 계산을 위한 interval 설정
   const startCpmInterval = useCallback(() => {
@@ -66,15 +82,23 @@ export function TypingSection() {
       (e.key === 'Enter' || e.key === ' ')
     ) {
       setReport({ cpm: currentCpm, accuracy, count: count + 1 });
-      fetchSentence();
+      void fetchSentence();
     }
   };
 
   // 데이터 베이스에서 랜덤한 문장을 가져와서 화면에 표시
   useEffect(() => {
-    fetchSentence();
-    console.log('fetchSentence');
-  }, []);
+    const fetchData = async () => {
+      try {
+        await loadSentences();
+        startCpmInterval();
+      } catch (error) {
+        console.error('Failed to load sentences: ', error);
+      }
+    };
+
+    void fetchData();
+  }, [loadSentences, startCpmInterval]);
 
   // 입력한 글자와 문장을 비교하여 색상을 변경
   useEffect(() => {
@@ -122,7 +146,7 @@ export function TypingSection() {
             onKeyDown={(e) => {
               keyPressEscape(e, setInputValue, setCpm, setTime);
               saveReport(e);
-              handleEnter(e);
+              handleEnter(e, sentence, setSentence);
             }}
             value={inputValue}
             placeholder="문장을 입력하세요"

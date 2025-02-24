@@ -1,8 +1,8 @@
 // 디스플레이에 표시되는 문자의 색상 계산
-export function calculateCharColors(
+export const calculateCharColors = (
   sentence: string,
   inputValue: string
-): { newCharColors: string[]; newDisplayWord: string } {
+): { newCharColors: string[]; newDisplayWord: string } => {
   const newCharColors = Array(sentence.length).fill('white');
   const newDisplayWord = sentence.split('');
 

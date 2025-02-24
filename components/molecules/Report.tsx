@@ -1,5 +1,5 @@
 'use client';
-import { useReportStore } from '@/store/reportStore';
+import { useReportStore } from '@/stores/reportStore';
 import { RealTimeCPM } from '@/components/atoms';
 
 export function Report() {

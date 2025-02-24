@@ -1,5 +1,5 @@
 'use client';
-import { useCpmStore } from '@/store/cpmStore';
+import { useCpmStore } from '@/stores/cpmStore';
 
 export function RealTimeCPM() {
   const { cpm } = useCpmStore();
