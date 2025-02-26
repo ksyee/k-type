@@ -8,11 +8,10 @@ export const GET = async (request: Request) => {
     });
 
     if (!response.ok) {
-      return new Response('문장을 불러오지 못했습니다.', { status: 404, })
+      return new Response('문장을 불러오지 못했습니다.', { status: 404 });
     }
 
     const data = await response.json();
-    console.log(data);
 
     return new Response(JSON.stringify(data), {
       status: 200,

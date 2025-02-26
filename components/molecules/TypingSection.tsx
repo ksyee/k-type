@@ -7,6 +7,7 @@ import { Report } from '@/components/molecules';
 import { fetchSentence } from '@/services/api';
 import { calculateCharColors } from '@/utils/colorUtil';
 import {
+  handleScreenClick,
   handleInput,
   handleEnter,
   keyPressEscape,
@@ -64,13 +65,6 @@ export function TypingSection() {
     return () => clearInterval(intervalId);
   }, [calculateCpm, setCpm]);
 
-  // 화면 클릭 시 input에 포커스
-  const handleScreenClick = () => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
-
   // 결과 저장
   const saveReport = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     const currentCpm = calculateCpm();
@@ -112,7 +106,12 @@ export function TypingSection() {
   }, [inputValue, sentence]);
 
   return (
-    <section className="relative h-screen w-screen" onClick={handleScreenClick}>
+    <section
+      className="relative h-screen w-screen"
+      onClick={() => {
+        handleScreenClick(inputRef);
+      }}
+    >
       <h2 className="sr-only">타이핑 섹션</h2>
       <div className="absolute left-1/2 top-1/3 w-[80%] min-w-[800px] max-w-[900px] -translate-x-1/2">
         <Report />
@@ -143,10 +142,10 @@ export function TypingSection() {
                 setTextareaLines
               )
             }
-            onKeyDown={(e) => {
-              keyPressEscape(e, setInputValue, setCpm, setTime);
+            onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+              keyPressEscape(e, setInputValue, setCpm, setTime, inputRef);
               saveReport(e);
-              handleEnter(e, sentence, setSentence);
+              handleEnter(e, inputValue, sentence, setSentence);
             }}
             value={inputValue}
             placeholder="문장을 입력하세요"

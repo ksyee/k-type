@@ -1,6 +1,13 @@
 // handlers/inputHandlers.ts
 import React from 'react';
 
+// 화면 클릭 시 input에 포커스
+export const handleScreenClick = (
+  inputRef: React.RefObject<HTMLTextAreaElement>
+) => {
+  inputRef.current?.focus();
+};
+
 export const handleInput = (
   e: React.ChangeEvent<HTMLTextAreaElement>,
   startTime: number | null,
@@ -29,6 +36,7 @@ export const handleInput = (
 
 export const handleEnter = (
   e: React.KeyboardEvent<HTMLTextAreaElement>,
+  inputValue: string,
   sentence: {
     speaker: string;
     text: string;
@@ -43,23 +51,25 @@ export const handleEnter = (
   if (e.key === 'Enter') {
     e.preventDefault();
 
-    setSentence((prev) => ({
-      ...prev,
-      speaker: 'Loading...',
-      text: '문장을 불러오는 중입니다...',
-    }));
+    // if (inputValue.length >= sentence.text.length)
+    //   setSentence(sentence[1]);
   }
 };
 
 export const keyPressEscape = (
-  e: React.KeyboardEvent<HTMLTextAreaElement>,
+  e: React.KeyboardEvent<HTMLElement>,
   setInputValue: (value: string) => void,
   setCpm: (cpm: number) => void,
-  setTime: (time: { startTime: number | null; endTime: number | null }) => void
+  setTime: (time: { startTime: number | null; endTime: number | null }) => void,
+  inputRef: React.RefObject<HTMLTextAreaElement>
 ) => {
   if (e.key === 'Escape') {
-    setInputValue('');
-    setCpm(0);
-    setTime({ startTime: null, endTime: null });
+    setTimeout(() => {
+      setInputValue('');
+      setCpm(0);
+      setTime({ startTime: null, endTime: null });
+
+      inputRef.current?.focus();
+    }, 10);
   }
 };
