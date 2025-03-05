@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useCpmStore } from '@/stores/cpmStore';
 import { useReportStore } from '@/stores/reportStore';
 import { Report } from '@/components/molecules';
+import { useSentenceStore } from '@/stores/sentenceStore';
 
 import { fetchSentence } from '@/services/api';
 import { calculateCharColors } from '@/utils/colorUtil';
@@ -24,18 +25,18 @@ export function TypingSection() {
     setTime,
     typingTime,
     calculateCpm,
-    inputValue,
-    setInputValue,
+    increaseKeyCount,
+    decreaseKeyCount,
   } = useCpmStore();
   const { startTime } = typingTime;
 
   const { report, setReport } = useReportStore();
+  const { setSentences, currentSentence, getRandomSentence } =
+    useSentenceStore();
 
-  const [sentence, setSentence] = useState<{ speaker: string; text: string }>({
-    speaker: 'Loading...',
-    text: '문장을 불러오는 중입니다...',
-  });
-  const [displayWord, setDisplayWord] = useState<string>(sentence.text);
+  const [inputValue, setInputValue] = useState<string>('');
+
+  const [displayWord, setDisplayWord] = useState<string>(currentSentence.text);
   const [charColors, setCharColors] = useState<string[]>(
     Array(displayWord.length).fill('white')
   );
@@ -48,37 +49,24 @@ export function TypingSection() {
     try {
       const response: Sentence[] = await fetchSentence();
       console.log(response);
-      setSentence(response[1]);
+      setSentences(response);
+      getRandomSentence();
     } catch (error) {
       console.error('Error fetching sentence:', error);
       throw error;
     }
-  }, []);
+  }, [getRandomSentence, setSentences]);
 
   // CPM 계산을 위한 interval 설정
   const startCpmInterval = useCallback(() => {
     const intervalId = setInterval(() => {
       const currentCpm = calculateCpm();
+      console.log('CPM: ', currentCpm);
       setCpm(currentCpm);
     }, 100);
 
     return () => clearInterval(intervalId);
   }, [calculateCpm, setCpm]);
-
-  // 결과 저장
-  const saveReport = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    const currentCpm = calculateCpm();
-    const accuracy = 100;
-    const count = report.count;
-
-    if (
-      inputValue.length >= sentence.text.length &&
-      (e.key === 'Enter' || e.key === ' ')
-    ) {
-      setReport({ cpm: currentCpm, accuracy, count: count + 1 });
-      void fetchSentence();
-    }
-  };
 
   // 데이터 베이스에서 랜덤한 문장을 가져와서 화면에 표시
   useEffect(() => {
@@ -97,13 +85,13 @@ export function TypingSection() {
   // 입력한 글자와 문장을 비교하여 색상을 변경
   useEffect(() => {
     const { newCharColors, newDisplayWord } = calculateCharColors(
-      sentence.text,
+      currentSentence.text,
       inputValue
     );
 
     setCharColors(newCharColors);
     setDisplayWord(newDisplayWord);
-  }, [inputValue, sentence]);
+  }, [inputValue, currentSentence]);
 
   return (
     <section
@@ -116,7 +104,7 @@ export function TypingSection() {
       <div className="absolute left-1/2 top-1/3 w-[80%] min-w-[800px] max-w-[900px] -translate-x-1/2">
         <Report />
         <div className="overflow-hidden rounded-lg bg-zinc-700 px-48pxr py-48pxr text-zinc-50">
-          <span>-{sentence.speaker}-</span>
+          <span>-{currentSentence.speaker}-</span>
           <p className="mb-8pxr mt-8pxr text-20pxr">
             {displayWord.split('').map((char, index) => {
               return (
@@ -144,8 +132,14 @@ export function TypingSection() {
             }
             onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
               keyPressEscape(e, setInputValue, setCpm, setTime, inputRef);
-              saveReport(e);
-              handleEnter(e, inputValue, sentence, setSentence);
+              handleEnter(
+                e,
+                inputValue,
+                setInputValue,
+                calculateCpm,
+                setReport,
+                report
+              );
             }}
             value={inputValue}
             placeholder="문장을 입력하세요"

@@ -1,5 +1,7 @@
 // handlers/inputHandlers.ts
 import React from 'react';
+import { useCpmStore } from '@/stores/cpmStore';
+import { useSentenceStore } from '@/stores/sentenceStore';
 
 // 화면 클릭 시 input에 포커스
 export const handleScreenClick = (
@@ -37,22 +39,30 @@ export const handleInput = (
 export const handleEnter = (
   e: React.KeyboardEvent<HTMLTextAreaElement>,
   inputValue: string,
-  sentence: {
-    speaker: string;
-    text: string;
-  },
-  setSentence: React.Dispatch<
-    React.SetStateAction<{
-      speaker: string;
-      text: string;
-    }>
-  >
+  setInputValue: (value: string) => void,
+  calculateCpm: () => number,
+  setReport: (report: { cpm: number; accuracy: number; count: number }) => void,
+  report: { cpm: number; accuracy: number; count: number }
 ) => {
   if (e.key === 'Enter') {
     e.preventDefault();
 
-    // if (inputValue.length >= sentence.text.length)
-    //   setSentence(sentence[1]);
+    // getState()를 통해 store의 상태를 가져옴
+    const { currentSentence, getRandomSentence } = useSentenceStore.getState();
+
+    // 결과 저장
+    const currentCpm = calculateCpm();
+    const accuracy = 100;
+    const count = report.count;
+
+    if (
+      inputValue.length >= currentSentence.text.length &&
+      (e.key === 'Enter' || e.key === ' ')
+    ) {
+      setReport({ cpm: currentCpm, accuracy, count: count + 1 });
+      setInputValue('');
+      getRandomSentence();
+    }
   }
 };
 
