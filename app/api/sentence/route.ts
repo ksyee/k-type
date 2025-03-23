@@ -1,6 +1,6 @@
 export const GET = async (request: Request) => {
   try {
-    const response = await fetch('http://localhost:3000/static/data.json', {
+    const response = await fetch('http://localhost:3000/static/dataTest.json', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

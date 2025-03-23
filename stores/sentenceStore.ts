@@ -8,7 +8,7 @@ interface Sentence {
 interface SentenceStore {
   sentences: Sentence[];
   setSentences: (sentences: Sentence[]) => void;
-  usedSentences: Set<string>; // Set<{ speaker: string; text: string }> 대신 문자열 저장
+  usedSentences: Set<Sentence>; // Set<{ speaker: string; text: string }> 대신 문자열 저장
   currentSentence: Sentence;
   getRandomSentence: () => void;
 }
@@ -30,9 +30,13 @@ export const useSentenceStore = create<SentenceStore>((set, get) => ({
   getRandomSentence: () => {
     const { sentences, usedSentences } = get();
 
-    // 사용 가능한 문장 필터링
+    // 사용되지 않은 문장 필터링
     const availableSentences = sentences.filter(
-      (sentence) => !usedSentences.has(JSON.stringify(sentence))
+      (sentence) =>
+        !Array.from(usedSentences).some(
+          (used) =>
+            used.speaker === sentence.speaker && used.text === sentence.text
+        )
     );
 
     if (availableSentences.length === 0) {
@@ -47,9 +51,7 @@ export const useSentenceStore = create<SentenceStore>((set, get) => ({
     // 상태 업데이트
     set((state) => ({
       currentSentence: newSentence,
-      usedSentences: new Set(state.usedSentences).add(
-        JSON.stringify(newSentence)
-      ), // 문자열로 저장하여 비교 가능하게 만듦
+      usedSentences: new Set(state.usedSentences).add(newSentence), // 객체 그대로 저장
     }));
   },
 }));

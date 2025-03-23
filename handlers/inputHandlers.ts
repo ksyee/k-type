@@ -15,14 +15,15 @@ export const handleInput = (
   startTime: number | null,
   setTime: (time: { startTime: number | null; endTime: number | null }) => void,
   setInputValue: (value: string) => void,
-  startCpmInterval: () => () => void,
   setCpm: (cpm: number) => void,
   inputValue: string,
   setTextareaLines: (lines: number) => void
-) => {
+): void => {
+  const { calculateCpm } = useCpmStore.getState();
+  const newValue: string = e.target.value;
+
   if (startTime === null) {
     setTime({ startTime: Date.now(), endTime: null });
-    startCpmInterval();
   }
 
   if (inputValue.length === 0) {
@@ -30,9 +31,13 @@ export const handleInput = (
     setTime({ startTime: null, endTime: null });
   }
 
-  setInputValue(e.target.value);
+  setInputValue(newValue); // 상태 업데이트
 
-  const lines = e.target.value.split('\n').length;
+  setTimeout(() => {
+    setCpm(calculateCpm()); // 다음 이벤트 루프에서 최신 값 반영
+  }, 0);
+
+  const lines = newValue.split('\n').length;
   setTextareaLines(lines);
 };
 
@@ -80,6 +85,6 @@ export const keyPressEscape = (
       setTime({ startTime: null, endTime: null });
 
       inputRef.current?.focus();
-    }, 10);
+    }, 100);
   }
 };

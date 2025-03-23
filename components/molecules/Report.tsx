@@ -8,7 +8,7 @@ export function Report() {
   return (
     <ul className="mb-8pxr flex gap-4pxr text-white">
       <li className="flex flex-1 items-center rounded-lg bg-zinc-700 px-8pxr py-12pxr">
-        <span>CPM</span>
+        <span>PREV SPEED</span>
         <span className="ml-8pxr text-18pxr">{report.cpm}</span>
       </li>
       <li className="flex flex-1 items-center rounded-lg bg-zinc-700 px-8pxr py-12pxr">

@@ -20,14 +20,7 @@ interface Sentence {
 }
 
 export function TypingSection() {
-  const {
-    setCpm,
-    setTime,
-    typingTime,
-    calculateCpm,
-    increaseKeyCount,
-    decreaseKeyCount,
-  } = useCpmStore();
+  const { setCpm, setTime, typingTime, calculateCpm } = useCpmStore();
   const { startTime } = typingTime;
 
   const { report, setReport } = useReportStore();
@@ -57,30 +50,25 @@ export function TypingSection() {
     }
   }, [getRandomSentence, setSentences]);
 
-  // CPM 계산을 위한 interval 설정
-  const startCpmInterval = useCallback(() => {
-    const intervalId = setInterval(() => {
-      const currentCpm = calculateCpm();
-      console.log('CPM: ', currentCpm);
-      setCpm(currentCpm);
-    }, 100);
-
-    return () => clearInterval(intervalId);
-  }, [calculateCpm, setCpm]);
+  useEffect(() => {
+    console.log('최신 inputValue:', inputValue);
+    const updatedCpm = calculateCpm();
+    setCpm(updatedCpm);
+    console.log('최신 cpm:', updatedCpm);
+  }, [calculateCpm, inputValue, setCpm]); // inputValue가 변경될 때만 실행
 
   // 데이터 베이스에서 랜덤한 문장을 가져와서 화면에 표시
   useEffect(() => {
     const fetchData = async () => {
       try {
         await loadSentences();
-        startCpmInterval();
       } catch (error) {
         console.error('Failed to load sentences: ', error);
       }
     };
 
     void fetchData();
-  }, [loadSentences, startCpmInterval]);
+  }, [loadSentences]);
 
   // 입력한 글자와 문장을 비교하여 색상을 변경
   useEffect(() => {
@@ -124,7 +112,6 @@ export function TypingSection() {
                 startTime,
                 setTime,
                 setInputValue,
-                startCpmInterval,
                 setCpm,
                 inputValue,
                 setTextareaLines
