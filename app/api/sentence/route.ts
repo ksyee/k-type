@@ -1,17 +1,19 @@
 export const GET = async (request: Request) => {
   try {
-    const response = await fetch('http://localhost:3000/static/data.json', {
+    const response = await fetch('http://localhost:3000/static/dataTest.json', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-    }).then((res) => res.json());
+    });
 
-    if (!response) {
-      throw new Error('No data');
+    if (!response.ok) {
+      return new Response('문장을 불러오지 못했습니다.', { status: 404 });
     }
 
-    return new Response(JSON.stringify(response), {
+    const data = await response.json();
+
+    return new Response(JSON.stringify(data), {
       status: 200,
     });
   } catch (error) {

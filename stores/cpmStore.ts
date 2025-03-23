@@ -12,6 +12,7 @@ interface CpmStore {
     startTime: TypingTime;
     endTime: TypingTime;
   };
+  keyCount: number;
   setTime: (typingTime: { startTime: TypingTime; endTime: TypingTime }) => void;
   calculateCpm: () => number;
 }
@@ -26,21 +27,39 @@ export const useCpmStore = create<CpmStore>((set, get) => ({
     endTime: null,
   },
   setTime: (typingTime) => set({ typingTime }),
+  keyCount: 0,
+  // CPM 계산 함수
+  // calculateCpm: () => {
+  //   const { typingTime, keyCount } = get();
+  //   const { startTime, endTime } = typingTime;
+  //
+  //   if (startTime === null) {
+  //     return 0;
+  //   }
+  //
+  //   const timeDiff = Date.now() - startTime;
+  //
+  //   if (timeDiff > 0) {
+  //     return Math.floor((keyCount / timeDiff) * 60000);
+  //   }
+  //
+  //   return 0;
+  // },
+
   calculateCpm: () => {
-    const { typingTime, inputValue } = get();
+    const { typingTime, inputValue, setCpm } = get();
     const { startTime } = typingTime;
 
-    if (startTime === null) {
-      return 0;
-    }
+    if (startTime === null) return 0;
 
-    const timeDiff = Date.now() - startTime; // 입력 시간 계산
-    const inputLength = disassembleHangul(inputValue).length; // 자모 분리 후 길이 계산
+    const timeDiff = Date.now() - startTime;
+    if (timeDiff <= 0) return 0;
 
-    if (timeDiff > 0) {
-      return Math.floor((inputLength / timeDiff) * 60000); // 분당 글자수 계산
-    }
+    const inputLength = disassembleHangul(inputValue).length;
 
-    return 0;
+    const cpm = Math.floor((inputLength / timeDiff) * 60000);
+    setCpm(cpm); // 최신 상태 업데이트
+
+    return cpm;
   },
 }));
