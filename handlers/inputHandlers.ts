@@ -22,20 +22,22 @@ export const handleInput = (
   const { calculateCpm } = useCpmStore.getState();
   const newValue: string = e.target.value;
 
+  // 첫 입력 시 시작 시간 설정
   if (startTime === null) {
     setTime({ startTime: Date.now(), endTime: null });
   }
 
-  if (inputValue.length === 0) {
+  // 입력값이 비어있을 때 초기화
+  if (newValue.length === 0) {
     setCpm(0);
     setTime({ startTime: null, endTime: null });
   }
 
-  setInputValue(newValue); // 상태 업데이트
+  setInputValue(newValue);
 
-  setTimeout(() => {
-    setCpm(calculateCpm()); // 다음 이벤트 루프에서 최신 값 반영
-  }, 0);
+  // CPM 계산 및 업데이트
+  const newCpm = calculateCpm();
+  setCpm(newCpm);
 
   const lines = newValue.split('\n').length;
   setTextareaLines(lines);
@@ -54,18 +56,18 @@ export const handleEnter = (
 
     // getState()를 통해 store의 상태를 가져옴
     const { currentSentence, getRandomSentence } = useSentenceStore.getState();
+    const { setTime } = useCpmStore.getState();
 
     // 결과 저장
     const currentCpm = calculateCpm();
     const accuracy = 100;
     const count = report.count;
 
-    if (
-      inputValue.length >= currentSentence.text.length &&
-      (e.key === 'Enter' || e.key === ' ')
-    ) {
+    // 입력한 텍스트가 현재 문장의 길이와 같거나 더 길 때만 처리
+    if (inputValue.length >= currentSentence.text.length) {
       setReport({ cpm: currentCpm, accuracy, count: count + 1 });
       setInputValue('');
+      setTime({ startTime: null, endTime: null }); // 시간 초기화
       getRandomSentence();
     }
   }

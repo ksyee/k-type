@@ -13,13 +13,19 @@ interface CpmStore {
     endTime: TypingTime;
   };
   keyCount: number;
+  setKeyCount: (count: number) => void;
   setTime: (typingTime: { startTime: TypingTime; endTime: TypingTime }) => void;
   calculateCpm: () => number;
 }
 
 export const useCpmStore = create<CpmStore>((set, get) => ({
   inputValue: '',
-  setInputValue: (inputValue) => set({ inputValue }),
+  setInputValue: (inputValue) => {
+    set({ inputValue });
+    // 입력값이 변경될 때마다 자모 수를 계산하여 keyCount 업데이트
+    const jamoCount = disassembleHangul(inputValue).length;
+    set({ keyCount: jamoCount });
+  },
   cpm: 0,
   setCpm: (cpm) => set({ cpm }),
   typingTime: {
@@ -28,37 +34,20 @@ export const useCpmStore = create<CpmStore>((set, get) => ({
   },
   setTime: (typingTime) => set({ typingTime }),
   keyCount: 0,
-  // CPM 계산 함수
-  // calculateCpm: () => {
-  //   const { typingTime, keyCount } = get();
-  //   const { startTime, endTime } = typingTime;
-  //
-  //   if (startTime === null) {
-  //     return 0;
-  //   }
-  //
-  //   const timeDiff = Date.now() - startTime;
-  //
-  //   if (timeDiff > 0) {
-  //     return Math.floor((keyCount / timeDiff) * 60000);
-  //   }
-  //
-  //   return 0;
-  // },
-
+  setKeyCount: (count) => set({ keyCount: count }),
   calculateCpm: () => {
-    const { typingTime, inputValue, setCpm } = get();
+    const { typingTime, keyCount } = get();
     const { startTime } = typingTime;
 
-    if (startTime === null) return 0;
+    if (startTime === null || keyCount === 0) {
+      return 0;
+    }
 
-    const timeDiff = Date.now() - startTime;
+    const timeDiff = (Date.now() - startTime) / 1000; // 초 단위로 변환
     if (timeDiff <= 0) return 0;
 
-    const inputLength = disassembleHangul(inputValue).length;
-
-    const cpm = Math.floor((inputLength / timeDiff) * 60000);
-    setCpm(cpm); // 최신 상태 업데이트
+    // 분당 타자수 계산 (자모 단위)
+    const cpm = Math.floor((keyCount / timeDiff) * 60);
 
     return cpm;
   },
