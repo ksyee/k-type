@@ -32,14 +32,14 @@ export const useTyping = (): UseTypingReturn => {
   );
   const [textareaLines, setTextareaLines] = useState<number>(1);
 
-  // 0.1초 간격으로 CPM 업데이트
+  // CPM 업데이트 인터벌
   useEffect(() => {
     if (startTime === null) return;
 
     const intervalId = setInterval(() => {
       const newCpm = calculateCpm();
       setCpm(newCpm);
-    }, 100);
+    }, 50);
 
     return () => clearInterval(intervalId);
   }, [startTime, calculateCpm, setCpm]);
