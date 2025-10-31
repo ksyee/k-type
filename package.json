@@ -10,7 +10,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.1",
     "@types/lodash": "^4.17.7",
     "autoprefixer": "^10.4.20",
     "es-hangul": "^1.4.5",

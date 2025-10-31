@@ -2,7 +2,7 @@
 import React, { useCallback, useRef, useEffect } from 'react';
 import { useSentenceStore } from '@/stores/sentenceStore';
 import { Report } from '@/components/molecules';
-import { supabase } from '@/lib/supabase';
+import { fetchSentences } from '@/services/api';
 import { handleScreenClick } from '@/handlers/inputHandlers';
 import { useTyping } from '@/hooks/useTyping';
 import type { Sentence } from '@/types/typing';
@@ -20,14 +20,10 @@ export function TypingSection() {
     handleKeyDown,
   } = useTyping();
 
-  // Supabase에서 문장 데이터 로드
+  // 로컬 API에서 문장 데이터 로드
   const loadSentences = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('typing_sentences')
-        .select('speaker, text');
-
-      if (error) throw error;
+      const data = await fetchSentences();
 
       if (data) {
         setSentences(data as Sentence[]);

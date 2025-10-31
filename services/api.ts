@@ -1,6 +1,6 @@
-export const fetchSentence = async () => {
+export const fetchSentences = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/sentence/', {
+    const response = await fetch('/api/sentence/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -8,12 +8,12 @@ export const fetchSentence = async () => {
     });
 
     if (!response.ok) {
-      return new Response('문장을 불러오지 못했습니다.', { status:404});
+      throw new Error('문장을 불러오지 못했습니다.');
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching sentence:', error);
+    console.error('Error fetching sentences:', error);
     throw error;
   }
 };
